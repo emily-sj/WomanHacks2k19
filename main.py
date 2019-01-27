@@ -15,8 +15,8 @@ CORS(app)
 access = None
 
 client = smartcar.AuthClient(
-    client_id='',
-    client_secret='',
+    client_id=os.environ.get('CLIENT_ID'),
+    client_secret=os.environ.get('CLIENT_SECRET'),
     redirect_uri='https://magni-find.herokuapp.com/exchange',
     scope=['read_vehicle_info','read_odometer', 'control_security',
     'control_security:unlock','read_location' ],
