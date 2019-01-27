@@ -93,11 +93,17 @@ def timerpage():
 
         <button>Stop</button>
         </form>
+        <form action="/final" method="post">
+
+        <button>Fetch Data</button>
+        </form>
     '''
+
+
 
 @app.route('/timer_start', methods=['POST'])
 def timer_start():
-    time2['time_start'] = time.time()
+    time2['timer_start'] = time.time()
     print time2
     return redirect('/timer')
 
@@ -108,6 +114,11 @@ def timer_end():
     return redirect('/timer')
 
 
+@app.route('/final', methods =['POST'])
+def final():
+    final = time2['timer_end']-time2['timer_start']
+    print final
+    return redirect('/timer')
 
 if __name__ == '__main__':
     app.run(port=8000)
