@@ -92,7 +92,7 @@ def vehicle():
 def timerpage():
     auth_url = client.get_auth_url()
     return '''
-        <h1>!</h1>
+        <h1>Welcome to Magni-find!</h1>
         <a href=%s>
             <button>Connect Car</button>
         </a>
