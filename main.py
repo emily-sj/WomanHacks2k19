@@ -102,6 +102,8 @@ def timerpage():
         </form>
     ''' % auth_url
 
+
+
 @app.route('/timer_start', methods=['POST'])
 def timer_start():
     time2['timer_start'] = time.time()
@@ -134,6 +136,11 @@ def final():
     return redirect('/timer')
 
 
+@app.route('/final', methods =['POST'])
+def final():
+    final = time2['timer_end']-time2['timer_start']
+    print final
+    return redirect('/timer')
 
 
 
