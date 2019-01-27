@@ -14,9 +14,9 @@ CORS(app)
 access = None
 
 client = smartcar.AuthClient(
-    client_id=os.environ.get('CLIENT_ID'),
-    client_secret=os.environ.get('CLIENT_SECRET'),
-    redirect_uri=os.environ.get('REDIRECT_URI'),
+    client_id='',
+    client_secret='',
+    redirect_uri='http://localhost:8000/exchange',
     scope=['read_vehicle_info','read_odometer', 'control_security', 'control_security:unlock','read_location' ],
     test_mode=False
 )
@@ -25,19 +25,19 @@ time2={}
 # TODO: Authorization Step 1a: Launch Smartcar authorization dialog
 
 #@app.route('/',methods=['GET'])
+odometer2={}
 
-
-@app.route('/login', methods=['GET'])
-def login():
-    # TODO: Authorization Step 1b: Launch Smartcar authorization dialog
-    auth_url = client.get_auth_url()
-    return '''
-        <h1>!</h1>
-        <a href=%s>
-            <button>Start</button>
-        </a>
-
-    ''' % auth_url
+# @app.route('/login', methods=['GET'])
+# def login():
+#     # TODO: Authorization Step 1b: Launch Smartcar authorization dialog
+#     auth_url = client.get_auth_url()
+#     return '''
+#         <h1>!</h1>
+#         <a href=%s>
+#             <button>Start</button>
+#         </a>
+#
+#     ''' % auth_url
 
 
 
@@ -73,8 +73,8 @@ def vehicle():
 
     vehicle.unlock()
 
-    response2 = vehicle.odometer()
-    print(response2)
+    odometer2 = vehicle.odometer()
+    print(odometer2)
 
     time_start= time.time()
     seconds=0
@@ -82,30 +82,58 @@ def vehicle():
 
 
 
+
 @app.route('/timer', methods=['GET'])
 def timerpage():
+    auth_url = client.get_auth_url()
     return '''
         <h1>!</h1>
+        <a href=%s>
+            <button>Connect Car</button>
+        </a>
         <form action="/timer_start" method="post">
             <button>Start</button>
         </form>
-        <form action="/timer_stop" method="post">
-
-        <button>Stop</button>
+        <form action="/timer_end" method="post">
+            <button>Stop</button>
         </form>
-    '''
+        <form action="/final" method="post">
+            <button>Fetch All My Data</button>
+        </form>
+    ''' % auth_url
 
 @app.route('/timer_start', methods=['POST'])
 def timer_start():
-    time2['time_start'] = time.time()
+    time2['timer_start'] = time.time()
+    vehicle_ids = smartcar.get_vehicle_ids(
+        access['access_token'])['vehicles']
+    vehicle = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
+    odometer2['start_odometer']= vehicle.odometer()
     print time2
+    print odometer2
     return redirect('/timer')
 
-@app.route('/timer_stop', methods=['POST'])
+
+@app.route('/timer_end', methods=['POST'])
 def timer_end():
     time2['timer_end']= time.time()
+    vehicle_ids = smartcar.get_vehicle_ids(
+        access['access_token'])['vehicles']
+    vehicle = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
+    odometer2['end_odometer']= vehicle.odometer()
     print time2
+    print odometer2
     return redirect('/timer')
+
+@app.route('/final', methods=['POST'])
+def final():
+    final= time2['timer_end']-time2['timer_start']
+    final2= odometer2['end_odometer']['data']['distance']-odometer2['start_odometer']['data']['distance']
+    print final
+    print final2
+    return redirect('/timer')
+
+
 
 
 
