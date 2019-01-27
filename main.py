@@ -17,7 +17,7 @@ access = None
 client = smartcar.AuthClient(
     client_id='',
     client_secret='',
-    redirect_uri='http://localhost:8000/exchange',
+    redirect_uri='https://magni-find.herokuapp.com/exchange',
     scope=['read_vehicle_info','read_odometer', 'control_security',
     'control_security:unlock','read_location' ],
     test_mode=False
@@ -152,4 +152,4 @@ def final():
 
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run(port=int(os.environ.get('PORT', 8000)))
