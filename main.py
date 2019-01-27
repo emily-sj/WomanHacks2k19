@@ -1,3 +1,4 @@
+
 import smartcar
 from flask import Flask, redirect, request, jsonify
 from flask_cors import CORS
@@ -17,7 +18,8 @@ client = smartcar.AuthClient(
     client_id='',
     client_secret='',
     redirect_uri='http://localhost:8000/exchange',
-    scope=['read_vehicle_info','read_odometer', 'control_security', 'control_security:unlock','read_location' ],
+    scope=['read_vehicle_info','read_odometer', 'control_security',
+    'control_security:unlock','read_location' ],
     test_mode=False
 )
 
@@ -27,6 +29,7 @@ time2={}
 #@app.route('/',methods=['GET'])
 odometer2={}
 
+location2={}
 # @app.route('/login', methods=['GET'])
 # def login():
 #     # TODO: Authorization Step 1b: Launch Smartcar authorization dialog
@@ -76,6 +79,8 @@ def vehicle():
     odometer2 = vehicle.odometer()
     print(odometer2)
 
+    return jsonify(info)
+
     time_start= time.time()
     seconds=0
     minutes=0
@@ -110,9 +115,11 @@ def timer_start():
     vehicle_ids = smartcar.get_vehicle_ids(
         access['access_token'])['vehicles']
     vehicle = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
+    location2['start_location']=vehicle.location()
     odometer2['start_odometer']= vehicle.odometer()
     print time2
     print odometer2
+    print location2
     return redirect('/timer')
 
 
@@ -122,25 +129,25 @@ def timer_end():
     vehicle_ids = smartcar.get_vehicle_ids(
         access['access_token'])['vehicles']
     vehicle = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
+    location2['end_location']=vehicle.location()
     odometer2['end_odometer']= vehicle.odometer()
     print time2
     print odometer2
+    print location2
     return redirect('/timer')
 
 @app.route('/final', methods=['POST'])
 def final():
     final= time2['timer_end']-time2['timer_start']
     final2= odometer2['end_odometer']['data']['distance']-odometer2['start_odometer']['data']['distance']
+    final3=final2/final
+    final4=location2
     print final
     print final2
+    print final3
+    print final4
     return redirect('/timer')
 
-
-@app.route('/final', methods =['POST'])
-def final():
-    final = time2['timer_end']-time2['timer_start']
-    print final
-    return redirect('/timer')
 
 
 
